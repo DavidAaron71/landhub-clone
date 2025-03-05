@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Інтерактивна інвестиційна карта України</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            height: 100vh;
+        }
+        #map {
+            width: 100%;
+            height: calc(100vh - 60px);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(to right, #0057B7, #FFD700);
+            padding: 5px 10px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .header .contact, .header .button-container {
+            display: flex;
+            align-items: center;
+        }
+        .header .contact img, .header .button-container img {
+            width: 28px;
+            height: 28px;
+            margin-right: 8px;
+        }
+        .header .title {
+            flex-grow: 1;
+            text-align: center;
+            font-size: 20px;
+        }
+        .header .button-container {
+            display: none; /* Временно скрываем кнопку */
+        }
+        .contact a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 10px;
+        }
+        .contact a:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="contact">
+            <span>+380 68 715 59 96</span>
+            <a href="tel:+380687155996">
+                <img src="https://cdn-icons-png.flaticon.com/512/724/724664.png" alt="Телефон" width="28">
+            </a>
+            <a href="https://t.me/AILandHUB" target="_blank">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" width="28">
+            </a>
+        </div>
+        <div class="title">Інтерактивна інвестиційна карта України</div>
+        <div class="button-container"> <!-- Сейчас скрыто, можно легко вернуть -->
+            <a href="https://invest-ukraine-homes-c8rz0yu.gamma.site/" target="_blank">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/4/49/Flag_of_Ukraine.svg" alt="Прапор України">
+                <span>Чому інвестувати зараз?</span>
+            </a>
+        </div>
+    </div>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map').setView([50.4501, 30.5234], 8);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            language: 'uk'
+        }).addTo(map);
+
+        var plots = [
+            { coords: [49.731599, 30.934432], name: "Зеленки", price: "$4,400", size: "0.25 га", distance: "65 км", link: "https://sites.google.com/view/zelenky/zelenky-village-land-details" },
+            { coords: [50.48332, 29.64154], name: "Нежиловичі", price: "$5,500", size: "0.25 га", distance: "50 км", link: "https://sites.google.com/view/nezhylovychi" },
+            { coords: [49.957788, 29.691694], name: "Ставище", price: "$5,500", size: "0.23 га", distance: "80 км", link: "https://sites.google.com/view/stavishche-23" },
+            { coords: [49.818270, 30.991137], name: "Очеретяне", price: "$4,500", size: "0.23 га", distance: "61 км", link: "https://sites.google.com/view/dm-1002" },
+            { coords: [49.955210, 29.670018], name: "Ставищенський ставок", price: "$5,000", size: "0.25 га", distance: "80 км", link: "https://sites.google.com/view/dm-1005" },
+            { coords: [50.483384, 29.715970], name: "Наливайківка", price: "$4,500", size: "0.13 га", distance: "44 км", link: "https://sites.google.com/view/dm-1006" },
+            { coords: [49.872386, 29.305616], name: "Макарівка", price: "$5,000", size: "0.13 га", distance: "121 км", link: "https://sites.google.com/view/dm-1007" },
+            { coords: [50.175413, 29.918489], name: "Дорогинка", price: "$6,000", size: "0.25 га", distance: "55 км", link: "https://sites.google.com/view/dm-1012" },
+            { coords: [49.629437, 30.123123], name: "Озерна", price: "$5,500", size: "0.25 га", distance: "121 км", link: "https://sites.google.com/view/land-in-ukraine" },
+            { coords: [50.164286, 29.698519], name: "Великі Гуляки", price: "$7,500", size: "0.25 га", distance: "62 км", link: "https://sites.google.com/view/velykihuliaki" }
+        ];
+
+        plots.forEach(plot => {
+            L.marker(plot.coords).addTo(map).bindPopup(`<b>${plot.name}</b><br>Ціна: ${plot.price}<br>Площа: ${plot.size}<br>Відстань до Києва: ${plot.distance}<br><a href="#" onclick="window.location.href='${plot.link}'; return false;">Докладніше</a>`);
+        });
+    </script>
+</body>
+</html>
