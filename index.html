@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <title>Інтерактивна карта готових до продажу земельних ділянок
-
-    </title>
+    <title>Інтерактивна карта готових до продажу земельних ділянок</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
     <style>
         body {
@@ -44,9 +42,6 @@
             text-align: center;
             font-size: 20px;
         }
-        .header .button-container {
-            display: none;
-        }
         .contact a {
             display: flex;
             align-items: center;
@@ -57,7 +52,7 @@
             opacity: 0.8;
         }
     </style>
-    
+
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-GBY1G4B8K8"></script>
     <script>
@@ -114,7 +109,7 @@
                     Ціна: ${plot.price}<br>
                     Площа: ${plot.size}<br>
                     Відстань до Києва: ${plot.distance}<br>
-                    <a href="#" onclick="window.location.href='${plot.link}'; return false;">Докладніше</a>
+                    <a href="${plot.link}" target="_blank" rel="noopener noreferrer">Докладніше</a>
                 `);
 
                 if (window.innerWidth > 768) {
