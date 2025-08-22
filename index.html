@@ -130,41 +130,5 @@
       }
     });
   </script>
-
-<!-- === НАЧАЛО КОДА ДЛЯ ОТСЛЕЖИВАНИЯ КЛИКОВ (ШАГ 5) === -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Небольшая задержка, чтобы карта успела загрузиться
-  setTimeout(function() {
-    // Находим все метки на карте. У вашей карты они имеют класс 'leaflet-marker-icon'
-    const markers = document.querySelectorAll('.leaflet-marker-icon');
-
-    markers.forEach(marker => {
-      marker.addEventListener('click', function() {
-        // При клике, мы пытаемся найти всплывающее окно (popup) с информацией
-        setTimeout(function() {
-          const popup = document.querySelector('.leaflet-popup-content');
-          if (popup) {
-            // Извлекаем из попапа название участка. В вашем коде оно находится в теге <b>
-            const plotTitleElement = popup.querySelector('b');
-            const plotId = plotTitleElement ? plotTitleElement.innerText : 'unknown_plot';
-
-            // Отправляем событие в Google Аналитику
-            if (typeof gtag === 'function') {
-              gtag('event', 'select_plot', {
-                'plot_id': plotId,
-                'event_label': 'Клик по участку на карте'
-              });
-              console.log('Отправлено событие в GA: select_plot, ID участка:', plotId);
-            }
-          }
-        }, 100); // Короткая задержка для появления попапа
-      });
-    });
-  }, 2000); // Ждем 2 секунды после загрузки страницы
-});
-</script>
-<!-- === КОНЕЦ КОДА ДЛЯ ОТСЛЕЖИВАНИЯ КЛИКОВ === -->
-
 </body>
 </html>
