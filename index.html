@@ -43,8 +43,8 @@
   
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      // Инициализируем карту БЕЗ установки вида
-      var map = L.map('map');
+      // ИСПРАВЛЕНО: Возвращаем первоначальную центровку.
+      var map = L.map('map').setView([50.4501, 30.5234], 8);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -91,16 +91,12 @@
 
       map.addLayer(markers);
 
-      // --- НОВАЯ ЛОГИКА АВТОМАСШТАБИРОВАНИЯ ---
+      // --- ЛОГИКА АВТОМАСШТАБИРОВАНИЯ (теперь работает корректно) ---
       if (markers.getLayers().length > 0) {
-        // Получаем границы всех маркеров в группе
         var bounds = markers.getBounds();
-        // Устанавливаем вид карты по этим границам с небольшим отступом
         map.fitBounds(bounds, { padding: [50, 50] });
-      } else {
-        // Если видимых маркеров нет, показываем Киев по умолчанию
-        map.setView([50.4501, 30.5234], 8);
       }
+      // Резервный setView больше не нужен, так как он есть при инициализации
     });
   </script>
 </body>
