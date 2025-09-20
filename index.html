@@ -43,8 +43,7 @@
     
   <script> 
     document.addEventListener('DOMContentLoaded', function () { 
-      // --- ИЗМЕНЕНИЕ 1: Карта инициализируется без жесткой привязки ---
-      var map = L.map('map'); 
+      var map = L.map('map').setView([50.4501, 30.5234], 8); 
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', 
@@ -62,8 +61,7 @@
           markerColor: color 
         }); 
       } 
-      
-      // --- ВАШ СПИСОК УЧАСТКОВ ОСТАЛСЯ НЕИЗМЕННЫМ ---
+
       var plots = [ 
         { type: 'house', color: 'orange', coords: [49.858071, 30.354294], name: "Мала Антонівка з Хатою", price: "$6,900", size: "0.31 га", distance: "74 км", link: "https://kyiv-land-map-57.lovable.app/house/1", visible: true }, 
         { type: 'plot', color: 'blue', coords: [50.101612, 30.664250], name: "Дерев'яна", price: "$6,000", size: "0.10 га", distance: "16 км", link: "https://kyiv-land-map-57.lovable.app/plot/1", visible: true }, 
@@ -100,15 +98,6 @@
       }); 
 
       map.addLayer(markers); 
-      
-      // --- ИЗМЕНЕНИЕ 2: Добавлена новая логика автомасштабирования ---
-      if (markers.getLayers().length > 0) {
-        var bounds = markers.getBounds();
-        map.fitBounds(bounds, { padding: [50, 50] });
-      } else {
-        // Резервный вариант, если видимых участков нет
-        map.setView([50.4501, 30.5234], 8);
-      }
     }); 
   </script> 
  </body> 
