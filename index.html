@@ -6,7 +6,6 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>Інтерактивна карта земельних ділянок</title>
 
-  <!-- Leaflet & plugins -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
@@ -18,31 +17,31 @@
     #map-container { position: relative; width: 100%; height: 100%; }
     #map { height: 100%; width: 100%; background: #f0f5ff; }
 
-    /* Overlay: карта полностью видна, поверх легкая вуаль + карточка-подсказка */
+    /* OVERLAY: прозорий фон, розмиття тільки в картці-підказці */
     .map-overlay {
       position: absolute; inset: 0;
-      background: rgba(255,255,255,0.25);
-      backdrop-filter: blur(3px);
+      background: transparent; /* карта повністю видима */
       z-index: 9999;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
     }
-    .overlay-text {
+    .overlay-card {
       display: flex; flex-direction: column; align-items: center;
-      color: #2b2b2b; font-size: 16px; font-weight: 600;
       padding: 14px 18px; border-radius: 14px;
-      background: rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.6);
       box-shadow: 0 4px 16px rgba(0,0,0,.16);
-      user-select: none;
+      border: 1px solid rgba(255,255,255,.7);
+      color: #2b2b2b; font-weight: 600; font-size: 16px; user-select: none;
+      -webkit-backdrop-filter: blur(6px) saturate(1.1);
+      backdrop-filter: blur(6px) saturate(1.1);
     }
-    .overlay-text::before {
+    .overlay-card::before {
       content: "🖱️";
       font-size: 22px;
       margin-bottom: 6px;
       opacity: .9;
     }
 
-    /* Controls */
     .map-controls {
       position: absolute; z-index: 10000; top: 12px; left: 12px;
       display: flex; gap: 8px; flex-wrap: wrap;
@@ -52,30 +51,21 @@
     }
     .hidden { opacity: 0; visibility: hidden; }
 
-    .btn {
-      appearance: none; border: 1px solid #d0d7de; background: #f6f8fa;
-      padding: 8px 12px; border-radius: 10px; cursor: pointer;
-      font-size: 14px; line-height: 1; user-select: none;
-    }
+    .btn { appearance: none; border: 1px solid #d0d7de; background: #f6f8fa; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-size: 14px; line-height: 1; user-select: none; }
     .btn:hover { background: #eef1f4; }
     .btn.active { background: #e6f7ff; border-color: #91d5ff; }
-    .btn .dot {
-      display: inline-block; width: 10px; height: 10px; border-radius: 50%;
-      margin-right: 6px; vertical-align: middle;
-    }
+    .btn .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
     .dot-house { background: #ff8c00; }
     .dot-plot  { background: #2f54eb; }
   </style>
 
-  <!-- GA4 (можна прибрати, якщо не потрібно) -->
+  <!-- GA4 (опціонально) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-GBY1G4B8K8"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){ dataLayer.push(arguments); }
     gtag('js', new Date());
     gtag('config', 'G-GBY1G4B8K8');
-
-    // Налаштування видимості панелі
     const CONFIG = { controlsVisible: true };
   </script>
 </head>
@@ -85,7 +75,7 @@
 
     <!-- Overlay -->
     <div id="map-overlay" class="map-overlay">
-      <div class="overlay-text">Клікніть, щоб активувати карту</div>
+      <div class="overlay-card">Клікніть, щоб активувати карту</div>
     </div>
 
     <!-- Filters -->
@@ -96,7 +86,6 @@
     </div>
   </div>
 
-  <!-- Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
   <script src="https://unpkg.com/leaflet.awesome-markers@2.0.4/dist/leaflet.awesome-markers.js"></script>
@@ -113,9 +102,9 @@
       var overlay = document.getElementById('map-overlay');
       var controls = document.getElementById('controls');
 
-      // Один клік для активації
+      // Один клік: прибираємо оверлей з DOM, вмикаємо взаємодію
       overlay.addEventListener('click', function () {
-        overlay.remove(); // повністю прибираємо оверлей
+        overlay.remove();
         map.dragging.enable();
         map.scrollWheelZoom.enable();
         map.touchZoom.enable();
@@ -123,7 +112,7 @@
         if (CONFIG.controlsVisible) controls.classList.remove('hidden');
       }, { once: true });
 
-      // Базові тайли
+      // Тайли
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map);
@@ -140,25 +129,14 @@
         });
       }
 
-      // Дані (повний список)
+      // Дані-приклад (вставь весь твой список)
       var plots = [
         { type: 'house', color: 'orange', coords: [49.858071, 30.354294], name: "Мала Антонівка з Хатою", price: "$6,900", size: "0.31 га", distance: "74 км", link: "https://kyiv-land-map-57.lovable.app/house/1", visible: true },
         { type: 'plot', color: 'blue', coords: [50.101612, 30.664250], name: "Дерев'яна", price: "$6,000", size: "0.10 га", distance: "16 км", link: "https://kyiv-land-map-57.lovable.app/plot/1", visible: true },
         { type: 'plot', color: 'blue', coords: [49.568303, 30.375027], name: "Чернин", price: "$6,900", size: "0.209 га", distance: "110 км", link: "https://kyiv-land-map-57.lovable.app/plot/2", visible: true },
-        { type: 'plot', color: 'blue', coords: [50.096876, 30.361080], name: "Барахти", price: "$6,900", size: "0.16 га", distance: "35 км", link: "https://vlasnyy-lis-bilya-ozyera-3ssvi85.gamma.site/", visible: false },
-        { type: 'plot', color: 'blue', coords: [49.818339, 30.991579], name: "Очеретяне", price: "$6,900", size: "0.25 га", distance: "60 км", link: "https://ocheretyane-t8iv1op.gamma.site/", visible: false },
-        { type: 'plot', color: 'blue', coords: [49.844932, 30.341834], name: "Мала Антонівка", price: "$5,000", size: "0.50 га", distance: "75 км", link: "https://malaantonivka50-2q6m8si.gamma.site/", visible: false },
-        { type: 'plot', color: 'blue', coords: [50.177453, 29.923875], name: "Дорогинка", price: "$8,500", size: "0.26 га", distance: "55 км", link: "https://sites.google.com/view/dorogynka7500?usp=sharing", visible: false },
-        { type: 'plot', color: 'blue', coords: [49.769642, 31.547382], name: "Келеберда", price: "$1,500", size: "0.10 га", distance: "115 км", link: "https://sites.google.com/view/keleberda-1500?usp=sharing", visible: false },
-        { type: 'plot', color: 'blue', coords: [50.304277, 30.027028], name: "Мостище", price: "$7,500", size: "0.15 га", distance: "26 км", link: "https://mostysche-bclf69s.gamma.site/", visible: false },
-        { type: 'plot', color: 'blue', coords: [50.501963, 29.620025], name: "Ніжиловичі", price: "$8,900", size: "0.60 га", distance: "50 км", link: "https://kyiv-land-map-57.lovable.app/plot/3", visible: true },
-        { type: 'plot', color: 'blue', coords: [49.955224, 29.669791], name: "Ставище25", price: "$5,900", size: "0.25 га", distance: "80 км", link: "https://stavysche25-kitl2zs.gamma.site/", visible: false },
-        { type: 'plot', color: 'blue', coords: [49.957788, 29.691694], name: "Ставище", price: "$5,500", size: "0.23 га", distance: "80 км", link: "https://sites.google.com/view/stavishche-23", visible: false },
-        { type: 'plot', color: 'blue', coords: [49.476711, 30.139640], name: "Іванівка", price: "$7,500", size: "0.36 га", distance: "111 км", link: "https://sites.google.com/view/ivanivka-112?usp=sharing", visible: false },
-        { type: 'plot', color: 'blue', coords: [49.632752, 31.546075], name: "Михайлівка", price: "$10,000", size: "1 га", distance: "120 км", link: "https://sites.google.com/view/myhailivka/%D0%B3%D0%BB%D0%B0%D0%B2%D0%BD%D0%B0%D1%8F-%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B0", visible: false }
+        { type: 'plot', color: 'blue', coords: [50.501963, 29.620025], name: "Ніжиловичі", price: "$8,900", size: "0.60 га", distance: "50 км", link: "https://kyiv-land-map-57.lovable.app/plot/3", visible: true }
       ];
 
-      // Маркери
       plots.forEach(function(plot) {
         if (!plot.hasOwnProperty("visible") || plot.visible) {
           var marker = L.marker(plot.coords, { icon: createCustomIcon(plot.type, plot.color) });
@@ -176,7 +154,6 @@
       map.addLayer(clusterHouses);
       map.addLayer(clusterPlots);
 
-      // Масштаб на всі
       function getVisibleBounds() {
         var group = L.featureGroup([]);
         if (map.hasLayer(clusterHouses)) group.addLayer(clusterHouses);
@@ -193,7 +170,6 @@
       }
       fitAll();
 
-      // Фільтри
       var btnHouses = document.getElementById('toggleHouses');
       var btnPlots  = document.getElementById('togglePlots');
       var btnReset  = document.getElementById('resetBtn');
