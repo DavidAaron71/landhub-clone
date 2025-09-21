@@ -44,6 +44,7 @@
   
   <script>
     document.addEventListener('DOMContentLoaded', function () {
+      // Початкове положення не так важливе — далі зробимо fitBounds
       var map = L.map('map').setView([50.4501, 30.5234], 8);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -105,6 +106,36 @@
       });
 
       map.addLayer(markers);
+
+      /* === АВТОМАСШТАБ + обов'язково включити Київ === */
+      const KYIV = L.latLng(50.4501, 30.5234);
+
+      function fitAllIncludingKyiv() {
+        // Границі всіх поточних видимих маркерів
+        let b = markers.getBounds ? markers.getBounds() : L.latLngBounds();
+
+        // Додаємо Київ, щоб він гарантовано попав у кадр
+        let all = L.latLngBounds(b);
+        all.extend(KYIV);
+
+        if (all.isValid()) {
+          map.fitBounds(all, {
+            padding: [40, 40],  // невеликі поля по краях
+            maxZoom: 11,        // на мобілці не заїжджаємо занадто близько
+            animate: false
+          });
+        } else {
+          // запасний варіант
+          map.setView(KYIV, 10);
+        }
+      }
+
+      // Викликаємо ПІСЛЯ того, як маркери додані в кластер
+      // Невелика затримка — щоб кластер встиг порахувати bounds
+      setTimeout(fitAllIncludingKyiv, 0);
+
+      // Перераховуємо при зміні розміру/орієнтації
+      map.on('resize', fitAllIncludingKyiv);
     });
   </script>
 </body>
