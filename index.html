@@ -106,12 +106,11 @@
 
       map.addLayer(markers);
 
-      <script>
-        if (markers.getLayers().length > 0) {
-          var bounds = markers.getBounds();
-          map.fitBounds(bounds, { padding: [50, 50] });
-        }
-      </script>
+      // --- ДОБАВЛЕНА ЛОГИКА АВТОМАСШТАБИРОВАНИЯ ---
+      if (markers.getLayers().length > 0) {
+        var bounds = markers.getBounds();
+        map.fitBounds(bounds, { padding: [50, 50] });
+      }
     });
   </script>
 </body>
