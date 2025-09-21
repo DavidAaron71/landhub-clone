@@ -18,7 +18,7 @@
     #map-wrap { position: relative; width: 100%; height: 100%; }
     #map { height: 100%; width: 100%; }
 
-    /* Прозрачный guard по всей карте (без затемнения) */
+    /* Прозрачный guard (НЕ затемняет карту) */
     .map-guard {
       position: absolute; inset: 0;
       background: transparent;
@@ -27,7 +27,7 @@
       cursor: pointer; user-select: none;
       -webkit-tap-highlight-color: transparent;
     }
-    /* Небольшая «frosted» карточка в центре — как на скрине */
+    /* Небольшая «frosted» карточка — как на твоём скрине */
     .hint-card {
       display: flex; flex-direction: column; align-items: center; gap: 8px;
       padding: 18px 28px;
@@ -43,7 +43,7 @@
     }
     .hint-card .mouse { font-size: 26px; line-height: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,.3)); }
 
-    /* Панель фильтров (скрыта по умолчанию) */
+    /* Панель фильтров (по умолчанию спрятана) */
     .map-controls {
       position: absolute; z-index: 10000; top: 12px; left: 12px;
       display: flex; gap: 8px; flex-wrap: wrap;
@@ -69,15 +69,15 @@
     gtag('js', new Date());
     gtag('config', 'G-GBY1G4B8K8');
 
-    /* Фильтры спрятаны по умолчанию */
-    const CONFIG = { controlsVisible: false };
+    /* Настройки: фильтры скрыты; «прокидывание» первого клика выключено */
+    const CONFIG = { controlsVisible: false, forwardClick: false };
   </script>
 </head>
 <body>
   <div id="map-wrap">
     <div id="map"></div>
 
-    <!-- Guard + компактная карточка -->
+    <!-- Guard + карточка -->
     <div id="map-guard" class="map-guard" aria-label="Клікніть, щоб активувати карту">
       <div class="hint-card">
         <div class="mouse">🖱️</div>
@@ -85,7 +85,7 @@
       </div>
     </div>
 
-    <!-- Фильтры (включишь через CONFIG.controlsVisible = true) -->
+    <!-- Фильтры -->
     <div id="controls" class="map-controls hidden">
       <button id="toggleHouses" class="btn active" title="Показати/приховати будинки"><span class="dot dot-house"></span> Будинки</button>
       <button id="togglePlots" class="btn active" title="Показати/приховати ділянки"><span class="dot dot-plot"></span> Ділянки</button>
@@ -100,53 +100,37 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
+      // 1) Создаём карту БЕЗ отключения интеракций (как в твоём рабочем коде)
       var map = L.map('map', { zoomControl: false }).setView([50.4501, 30.5234], 8);
 
-      // До клика карта «неактивна»
-      map.dragging.disable();
-      map.scrollWheelZoom.disable();
-      map.touchZoom.disable();
+      L.control.zoom({ position: 'topright' }).addTo(map);
 
-      var guard = document.getElementById('map-guard');
-      var controls = document.getElementById('controls');
-
-      function forwardFullClickSequence(x, y) {
-        // ждём, пока DOM пересчитается после удаления guard
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            var target = document.elementFromPoint(x, y);
-            if (!target) return;
-            const opts = { bubbles: true, cancelable: true, clientX: x, clientY: y };
-
-            // Полная последовательность событий — ближе к «настоящему» клику
-            target.dispatchEvent(new PointerEvent('pointerdown', opts));
-            target.dispatchEvent(new MouseEvent('mousedown', opts));
-            target.dispatchEvent(new MouseEvent('mouseup', opts));
-            target.dispatchEvent(new MouseEvent('click', opts));
-          });
-        });
-      }
-
-      // ОДИН клик: убрать guard, включить интерактив и кликнуть туда же
-      guard.addEventListener('click', function (e) {
-        var cx = e.clientX, cy = e.clientY;
-
-        guard.remove();
-        map.dragging.enable();
-        map.scrollWheelZoom.enable();
-        map.touchZoom.enable();
-        L.control.zoom({ position: 'topright' }).addTo(map);
-        if (CONFIG.controlsVisible) controls.classList.remove('hidden');
-
-        forwardFullClickSequence(cx, cy);
-      }, { once: true });
-
-      // Базовые тайлы
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map);
 
-      // Кластеры
+      // 2) Guard: просто перекрывает карту; на первый клик — удаляем и всё.
+      var guard = document.getElementById('map-guard');
+      var controls = document.getElementById('controls');
+
+      guard.addEventListener('click', function (e) {
+        var cx = e.clientX, cy = e.clientY;
+        guard.remove(); // убираем слой — карта сразу «живая»
+        if (CONFIG.controlsVisible) controls.classList.remove('hidden');
+
+        // опционально: «прокинуть» первый клик в реальную цель
+        if (CONFIG.forwardClick) {
+          requestAnimationFrame(() => {
+            var target = document.elementFromPoint(cx, cy);
+            if (target) {
+              const opts = { bubbles: true, cancelable: true, clientX: cx, clientY: cy };
+              target.dispatchEvent(new MouseEvent('click', opts));
+            }
+          });
+        }
+      }, { once: true });
+
+      // 3) Кластеры и маркеры — как у тебя
       var clusterHouses = L.markerClusterGroup({ maxClusterRadius: 25, disableClusteringAtZoom: 14 });
       var clusterPlots  = L.markerClusterGroup({ maxClusterRadius: 25, disableClusteringAtZoom: 14 });
 
@@ -158,7 +142,6 @@
         });
       }
 
-      // Данные
       var plots = [
         { type: 'house', color: 'orange', coords: [49.858071, 30.354294], name: "Мала Антонівка з Хатою", price: "$6,900", size: "0.31 га", distance: "74 км", link: "https://kyiv-land-map-57.lovable.app/house/1", visible: true },
         { type: 'plot', color: 'blue', coords: [50.101612, 30.664250], name: "Дерев'яна", price: "$6,000", size: "0.10 га", distance: "16 км", link: "https://kyiv-land-map-57.lovable.app/plot/1", visible: true },
