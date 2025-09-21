@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>Інтерактивна карта земельних ділянок</title>
-  
+
+  <!-- Leaflet & plugins -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
@@ -13,47 +14,123 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet.awesome-markers@2.0.4/dist/leaflet.awesome-markers.css">
 
   <style>
-    /* Стилі для карти, щоб вона займала весь доступний простір */
-    body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      width: 100%;
-      overflow: hidden; /* Забираємо можливі скролбари */
+    html, body { height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    #map-container { position: relative; width: 100%; height: 100%; }
+    #map { height: 100%; width: 100%; background: #f0f5ff; }
+
+    /* Overlay: карта полностью видна, поверх легкая вуаль + карточка-подсказка */
+    .map-overlay {
+      position: absolute; inset: 0;
+      background: rgba(255,255,255,0.25);
+      backdrop-filter: blur(3px);
+      z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
     }
-    #map {
-      height: 100%;
-      width: 100%;
+    .overlay-text {
+      display: flex; flex-direction: column; align-items: center;
+      color: #2b2b2b; font-size: 16px; font-weight: 600;
+      padding: 14px 18px; border-radius: 14px;
+      background: rgba(255,255,255,0.7);
+      box-shadow: 0 4px 16px rgba(0,0,0,.16);
+      user-select: none;
     }
+    .overlay-text::before {
+      content: "🖱️";
+      font-size: 22px;
+      margin-bottom: 6px;
+      opacity: .9;
+    }
+
+    /* Controls */
+    .map-controls {
+      position: absolute; z-index: 10000; top: 12px; left: 12px;
+      display: flex; gap: 8px; flex-wrap: wrap;
+      background: #fff; border-radius: 12px; padding: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.15);
+      transition: opacity .2s ease;
+    }
+    .hidden { opacity: 0; visibility: hidden; }
+
+    .btn {
+      appearance: none; border: 1px solid #d0d7de; background: #f6f8fa;
+      padding: 8px 12px; border-radius: 10px; cursor: pointer;
+      font-size: 14px; line-height: 1; user-select: none;
+    }
+    .btn:hover { background: #eef1f4; }
+    .btn.active { background: #e6f7ff; border-color: #91d5ff; }
+    .btn .dot {
+      display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+      margin-right: 6px; vertical-align: middle;
+    }
+    .dot-house { background: #ff8c00; }
+    .dot-plot  { background: #2f54eb; }
   </style>
 
+  <!-- GA4 (можна прибрати, якщо не потрібно) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-GBY1G4B8K8"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag(){ dataLayer.push(arguments); }
     gtag('js', new Date());
     gtag('config', 'G-GBY1G4B8K8');
+
+    // Налаштування видимості панелі
+    const CONFIG = { controlsVisible: true };
   </script>
 </head>
 <body>
-  <div id="map"></div>
+  <div id="map-container">
+    <div id="map"></div>
 
+    <!-- Overlay -->
+    <div id="map-overlay" class="map-overlay">
+      <div class="overlay-text">Клікніть, щоб активувати карту</div>
+    </div>
+
+    <!-- Filters -->
+    <div id="controls" class="map-controls hidden">
+      <button id="toggleHouses" class="btn active" title="Показати/приховати будинки"><span class="dot dot-house"></span> Будинки</button>
+      <button id="togglePlots" class="btn active" title="Показати/приховати ділянки"><span class="dot dot-plot"></span> Ділянки</button>
+      <button id="resetBtn" class="btn" title="Підігнати масштаб до всіх видимих точок">Показати всі</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
   <script src="https://unpkg.com/leaflet.awesome-markers@2.0.4/dist/leaflet.awesome-markers.js"></script>
-  
+
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      var map = L.map('map').setView([50.4501, 30.5234], 8);
+      var map = L.map('map', { zoomControl: false }).setView([50.4501, 30.5234], 8);
 
+      // До кліку — карта не взаємодіє
+      map.dragging.disable();
+      map.scrollWheelZoom.disable();
+      map.touchZoom.disable();
+
+      var overlay = document.getElementById('map-overlay');
+      var controls = document.getElementById('controls');
+
+      // Один клік для активації
+      overlay.addEventListener('click', function () {
+        overlay.remove(); // повністю прибираємо оверлей
+        map.dragging.enable();
+        map.scrollWheelZoom.enable();
+        map.touchZoom.enable();
+        L.control.zoom({ position: 'topright' }).addTo(map);
+        if (CONFIG.controlsVisible) controls.classList.remove('hidden');
+      }, { once: true });
+
+      // Базові тайли
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        language: 'uk'
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map);
 
-      var markers = L.markerClusterGroup({
-        maxClusterRadius: 25
-      });
+      // Кластери
+      var clusterHouses = L.markerClusterGroup({ maxClusterRadius: 25, disableClusteringAtZoom: 14 });
+      var clusterPlots  = L.markerClusterGroup({ maxClusterRadius: 25, disableClusteringAtZoom: 14 });
 
       function createCustomIcon(type, color) {
         return L.AwesomeMarkers.icon({
@@ -63,6 +140,7 @@
         });
       }
 
+      // Дані (повний список)
       var plots = [
         { type: 'house', color: 'orange', coords: [49.858071, 30.354294], name: "Мала Антонівка з Хатою", price: "$6,900", size: "0.31 га", distance: "74 км", link: "https://kyiv-land-map-57.lovable.app/house/1", visible: true },
         { type: 'plot', color: 'blue', coords: [50.101612, 30.664250], name: "Дерев'яна", price: "$6,000", size: "0.10 га", distance: "16 км", link: "https://kyiv-land-map-57.lovable.app/plot/1", visible: true },
@@ -80,31 +158,54 @@
         { type: 'plot', color: 'blue', coords: [49.632752, 31.546075], name: "Михайлівка", price: "$10,000", size: "1 га", distance: "120 км", link: "https://sites.google.com/view/myhailivka/%D0%B3%D0%BB%D0%B0%D0%B2%D0%BD%D0%B0%D1%8F-%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B0", visible: false }
       ];
 
-      plots.forEach(plot => {
+      // Маркери
+      plots.forEach(function(plot) {
         if (!plot.hasOwnProperty("visible") || plot.visible) {
-          let marker = L.marker(plot.coords, {
-            icon: createCustomIcon(plot.type, plot.color)
-          });
-          
-          marker.bindPopup(`
-            <b>${plot.name}</b><br>
-            Ціна: ${plot.price}<br>
-            Площа: ${plot.size}<br>
-            Відстань до Києва: ${plot.distance}<br>
-            <a href="${plot.link}" target="_blank" rel="noopener noreferrer">Докладніше</a>
-          `);
-
-          marker.on('click', function() {
-            if (typeof gtag === 'function') {
-              gtag('event', 'select_plot', { 'plot_id': plot.name });
-            }
-          });
-          
-          markers.addLayer(marker);
+          var marker = L.marker(plot.coords, { icon: createCustomIcon(plot.type, plot.color) });
+          marker.bindPopup(
+            '<b>' + plot.name + '</b><br>' +
+            'Ціна: ' + plot.price + '<br>' +
+            'Площа: ' + plot.size + '<br>' +
+            'Відстань до Києва: ' + plot.distance + '<br>' +
+            '<a href="' + plot.link + '" target="_blank" rel="noopener noreferrer">Докладніше</a>'
+          );
+          if (plot.type === 'house') clusterHouses.addLayer(marker); else clusterPlots.addLayer(marker);
         }
       });
 
-      map.addLayer(markers);
+      map.addLayer(clusterHouses);
+      map.addLayer(clusterPlots);
+
+      // Масштаб на всі
+      function getVisibleBounds() {
+        var group = L.featureGroup([]);
+        if (map.hasLayer(clusterHouses)) group.addLayer(clusterHouses);
+        if (map.hasLayer(clusterPlots))  group.addLayer(clusterPlots);
+        return group.getBounds();
+      }
+      function fitAll() {
+        if (!map.hasLayer(clusterHouses) && !map.hasLayer(clusterPlots)) {
+          map.setView([50.4501, 30.5234], 8); return;
+        }
+        var b = getVisibleBounds();
+        if (b.isValid()) map.fitBounds(b, { padding: [50,50] });
+        else map.setView([50.4501, 30.5234], 8);
+      }
+      fitAll();
+
+      // Фільтри
+      var btnHouses = document.getElementById('toggleHouses');
+      var btnPlots  = document.getElementById('togglePlots');
+      var btnReset  = document.getElementById('resetBtn');
+
+      function toggleLayer(btn, layer) {
+        var active = btn.classList.toggle('active');
+        if (active) map.addLayer(layer); else map.removeLayer(layer);
+        fitAll();
+      }
+      btnHouses.addEventListener('click', function() { toggleLayer(btnHouses, clusterHouses); });
+      btnPlots.addEventListener('click', function() { toggleLayer(btnPlots, clusterPlots); });
+      btnReset.addEventListener('click', fitAll);
     });
   </script>
 </body>
