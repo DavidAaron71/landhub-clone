@@ -6,7 +6,6 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>Інтерактивна карта земельних ділянок</title>
 
-  <!-- Leaflet & plugins -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
@@ -61,7 +60,6 @@
     .dot-plot  { background: #2f54eb; }
   </style>
 
-  <!-- GA4 (опціонально) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-GBY1G4B8K8"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -69,15 +67,14 @@
     gtag('js', new Date());
     gtag('config', 'G-GBY1G4B8K8');
 
-    /* Настройки: фильтры скрыты; «прокидывание» первого клика выключено */
-    const CONFIG = { controlsVisible: false, forwardClick: false };
+    /* Настройки: фильтры скрыты; «прокидывание» первого клика ВКЛЮЧЕНО */
+    const CONFIG = { controlsVisible: false, forwardClick: true };
   </script>
 </head>
 <body>
   <div id="map-wrap">
     <div id="map"></div>
 
-    <!-- Guard + карточка -->
     <div id="map-guard" class="map-guard" aria-label="Клікніть, щоб активувати карту">
       <div class="hint-card">
         <div class="mouse">🖱️</div>
@@ -85,7 +82,6 @@
       </div>
     </div>
 
-    <!-- Фильтры -->
     <div id="controls" class="map-controls hidden">
       <button id="toggleHouses" class="btn active" title="Показати/приховати будинки"><span class="dot dot-house"></span> Будинки</button>
       <button id="togglePlots" class="btn active" title="Показати/приховати ділянки"><span class="dot dot-plot"></span> Ділянки</button>
@@ -93,7 +89,6 @@
     </div>
   </div>
 
-  <!-- Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
   <script src="https://unpkg.com/leaflet.awesome-markers@2.0.4/dist/leaflet.awesome-markers.js"></script>
