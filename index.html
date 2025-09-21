@@ -15,17 +15,17 @@
   <style>
     html, body { height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
     #map-container { position: relative; width: 100%; height: 100%; }
-    #map { height: 100%; width: 100%; background: #f0f5ff; } /* Добавили фон, чтобы не было "белой вспышки" */
+    #map { height: 100%; width: 100%; background: #f0f5ff; }
 
     /* Оверлей активації */
     .map-overlay {
       position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(100, 100, 100, 0.2); /* Сделали фон чуть темнее для контраста */
+      background: rgba(100, 100, 100, 0.2);
       backdrop-filter: blur(2px);
-      z-index: 9999; /* Высший приоритет, чтобы перекрыть все */
+      z-index: 9999;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
-      transition: opacity 0.3s ease; /* Плавное исчезновение */
+      transition: opacity 0.3s ease;
     }
     .overlay-text {
       background: rgba(0, 0, 0, 0.7); color: white;
@@ -39,8 +39,12 @@
       display: flex; gap: 8px; flex-wrap: wrap;
       background: #fff; border-radius: 12px; padding: 10px;
       box-shadow: 0 2px 10px rgba(0,0,0,.15);
+      transition: opacity 0.3s ease;
     }
-    .hidden { display: none !important; }
+    .hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
 
     .btn {
       appearance: none; border: 1px solid #d0d7de; background: #f6f8fa;
@@ -85,9 +89,10 @@
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       var map = L.map('map', {
-          zoomControl: false // Отключаем стандартный зум, т.к. карта неактивна
+          zoomControl: false // Отключаем стандартный зум
       }).setView([50.4501, 30.5234], 8);
 
+      // Блокируем управление картой
       map.dragging.disable();
       map.scrollWheelZoom.disable();
       map.touchZoom.disable();
@@ -95,22 +100,20 @@
       var overlay = document.getElementById('map-overlay');
       var controls = document.getElementById('controls');
 
+      // Слушатель клика для активации
       overlay.addEventListener('click', function() {
-        // Прячем оверлей плавно
         this.style.opacity = '0';
         setTimeout(() => { this.style.display = 'none'; }, 300);
 
-        // Активируем управление картой
         map.dragging.enable();
         map.scrollWheelZoom.enable();
         map.touchZoom.enable();
-        L.control.zoom({ position: 'topright' }).addTo(map); // Добавляем кнопки +/-
+        L.control.zoom({ position: 'topright' }).addTo(map);
 
-        // Показываем фильтры, если они включены в конфиге
         if (CONFIG.controlsVisible) {
           controls.classList.remove('hidden');
         }
-      }, { once: true }); // Cлушатель сработает только один раз
+      }, { once: true }); // Сработает только один раз
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -188,4 +191,8 @@
     });
   </script>
 </body>
-</html>
+</html></div>
+    <div id="map-overlay" class="map-overlay">
+      <div class="overlay-text">Клікніть, щоб активувати карту</div>
+    </div>
+    <div id="controls" class="map-controls hidden"> <button id="toggleHouses" class="btn active" title="Показати/приховати будинки"><span class="dot dot-house"></span> Бу
