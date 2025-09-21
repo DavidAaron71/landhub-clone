@@ -1,111 +1,118 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <title>Інтерактивна карта земельних ділянок</title>
-  
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.awesome-markers@2.0.4/dist/leaflet.awesome-markers.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <title>Інтерактивна карта земельних ділянок</title>
+  
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.awesome-markers@2.0.4/dist/leaflet.awesome-markers.css">
 
-  <style>
-    /* Стилі для карти, щоб вона займала весь доступний простір */
-    body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      width: 100%;
-      overflow: hidden; /* Забираємо можливі скролбари */
-    }
-    #map {
-      height: 100%;
-      width: 100%;
-    }
-  </style>
+  <style>
+    /* Стилі для карти, щоб вона займала весь доступний простір */
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden; /* Забираємо можливі скролбари */
+    }
+    #map {
+      height: 100%;
+      width: 100%;
+    }
+  </style>
 
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GBY1G4B8K8"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-GBY1G4B8K8');
-  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GBY1G4B8K8"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GBY1G4B8K8');
+  </script>
 </head>
 <body>
-  <div id="map"></div>
+  <div id="map"></div>
 
-  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
-  <script src="https://unpkg.com/leaflet.awesome-markers@2.0.4/dist/leaflet.awesome-markers.js"></script>
-  
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      var map = L.map('map').setView([50.4501, 30.5234], 8);
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+  <script src="https://unpkg.com/leaflet.awesome-markers@2.0.4/dist/leaflet.awesome-markers.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var map = L.map('map').setView([50.4501, 30.5234], 8);
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        language: 'uk'
-      }).addTo(map);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        language: 'uk'
+      }).addTo(map);
 
-      var markers = L.markerClusterGroup({
-        maxClusterRadius: 25
-      });
+      var markers = L.markerClusterGroup({
+        maxClusterRadius: 25
+      });
 
-      function createCustomIcon(type, color) {
-        return L.AwesomeMarkers.icon({
-          prefix: 'fa',
-          icon: type === 'house' ? 'home' : 'map-marker',
-          markerColor: color
-        });
-      }
+      function createCustomIcon(type, color) {
+        return L.AwesomeMarkers.icon({
+          prefix: 'fa',
+          icon: type === 'house' ? 'home' : 'map-marker',
+          markerColor: color
+        });
+      }
 
-      var plots = [
-        { type: 'house', color: 'orange', coords: [49.858071, 30.354294], name: "Мала Антонівка з Хатою", price: "$6,900", size: "0.31 га", distance: "74 км", link: "https://kyiv-land-map-57.lovable.app/house/1", visible: true },
-        { type: 'plot', color: 'blue', coords: [50.101612, 30.664250], name: "Дерев'яна", price: "$6,000", size: "0.10 га", distance: "16 км", link: "https://kyiv-land-map-57.lovable.app/plot/1", visible: true },
-        { type: 'plot', color: 'blue', coords: [49.568303, 30.375027], name: "Чернин", price: "$6,900", size: "0.209 га", distance: "110 км", link: "https://kyiv-land-map-57.lovable.app/plot/2", visible: true },
-        { type: 'plot', color: 'blue', coords: [50.096876, 30.361080], name: "Барахти", price: "$6,900", size: "0.16 га", distance: "35 км", link: "https://vlasnyy-lis-bilya-ozyera-3ssvi85.gamma.site/", visible: false },
-        { type: 'plot', color: 'blue', coords: [49.818339, 30.991579], name: "Очеретяне", price: "$6,900", size: "0.25 га", distance: "60 км", link: "https://ocheretyane-t8iv1op.gamma.site/", visible: false },
-        { type: 'plot', color: 'blue', coords: [49.844932, 30.341834], name: "Мала Антонівка", price: "$5,000", size: "0.50 га", distance: "75 км", link: "https://malaantonivka50-2q6m8si.gamma.site/", visible: false },
-        { type: 'plot', color: 'blue', coords: [50.177453, 29.923875], name: "Дорогинка", price: "$8,500", size: "0.26 га", distance: "55 км", link: "https://sites.google.com/view/dorogynka7500?usp=sharing", visible: false },
-        { type: 'plot', color: 'blue', coords: [49.769642, 31.547382], name: "Келеберда", price: "$1,500", size: "0.10 га", distance: "115 км", link: "https://sites.google.com/view/keleberda-1500?usp=sharing", visible: false },
-        { type: 'plot', color: 'blue', coords: [50.304277, 30.027028], name: "Мостище", price: "$7,500", size: "0.15 га", distance: "26 км", link: "https://mostysche-bclf69s.gamma.site/", visible: false },
-        { type: 'plot', color: 'blue', coords: [50.501963, 29.620025], name: "Ніжиловичі", price: "$8,900", size: "0.60 га", distance: "50 км", link: "https://kyiv-land-map-57.lovable.app/plot/3", visible: true },
-        { type: 'plot', color: 'blue', coords: [49.955224, 29.669791], name: "Ставище25", price: "$5,900", size: "0.25 га", distance: "80 км", link: "https://stavysche25-kitl2zs.gamma.site/", visible: false },
-        { type: 'plot', color: 'blue', coords: [49.957788, 29.691694], name: "Ставище", price: "$5,500", size: "0.23 га", distance: "80 км", link: "https://sites.google.com/view/stavishche-23", visible: false },
-        { type: 'plot', color: 'blue', coords: [49.476711, 30.139640], name: "Іванівка", price: "$7,500", size: "0.36 га", distance: "111 км", link: "https://sites.google.com/view/ivanivka-112?usp=sharing", visible: false },
-        { type: 'plot', color: 'blue', coords: [49.632752, 31.546075], name: "Михайлівка", price: "$10,000", size: "1 га", distance: "120 км", link: "https://sites.google.com/view/myhailivka/%D0%B3%D0%BB%D0%B0%D0%B2%D0%BD%D0%B0%D1%8F-%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B0", visible: false }
-      ];
+      var plots = [
+        { type: 'house', color: 'orange', coords: [49.858071, 30.354294], name: "Мала Антонівка з Хатою", price: "$6,900", size: "0.31 га", distance: "74 км", link: "https://kyiv-land-map-57.lovable.app/house/1", visible: true },
+        { type: 'plot', color: 'blue', coords: [50.101612, 30.664250], name: "Дерев'яна", price: "$6,000", size: "0.10 га", distance: "16 км", link: "https://kyiv-land-map-57.lovable.app/plot/1", visible: true },
+        { type: 'plot', color: 'blue', coords: [49.568303, 30.375027], name: "Чернин", price: "$6,900", size: "0.209 га", distance: "110 км", link: "https://kyiv-land-map-57.lovable.app/plot/2", visible: true },
+        { type: 'plot', color: 'blue', coords: [50.096876, 30.361080], name: "Барахти", price: "$6,900", size: "0.16 га", distance: "35 км", link: "https://vlasnyy-lis-bilya-ozyera-3ssvi85.gamma.site/", visible: false },
+        { type: 'plot', color: 'blue', coords: [49.818339, 30.991579], name: "Очеретяне", price: "$6,900", size: "0.25 га", distance: "60 км", link: "https://ocheretyane-t8iv1op.gamma.site/", visible: false },
+        { type: 'plot', color: 'blue', coords: [49.844932, 30.341834], name: "Мала Антонівка", price: "$5,000", size: "0.50 га", distance: "75 км", link: "https://malaantonivka50-2q6m8si.gamma.site/", visible: false },
+        { type: 'plot', color: 'blue', coords: [50.177453, 29.923875], name: "Дорогинка", price: "$8,500", size: "0.26 га", distance: "55 км", link: "https://sites.google.com/view/dorogynka7500?usp=sharing", visible: false },
+        { type: 'plot', color: 'blue', coords: [49.769642, 31.547382], name: "Келеберда", price: "$1,500", size: "0.10 га", distance: "115 км", link: "https://sites.google.com/view/keleberda-1500?usp=sharing", visible: false },
+        { type: 'plot', color: 'blue', coords: [50.304277, 30.027028], name: "Мостище", price: "$7,500", size: "0.15 га", distance: "26 км", link: "https://mostysche-bclf69s.gamma.site/", visible: false },
+        { type: 'plot', color: 'blue', coords: [50.501963, 29.620025], name: "Ніжиловичі", price: "$8,900", size: "0.60 га", distance: "50 км", link: "https://kyiv-land-map-57.lovable.app/plot/3", visible: true },
+        { type: 'plot', color: 'blue', coords: [49.955224, 29.669791], name: "Ставище25", price: "$5,900", size: "0.25 га", distance: "80 км", link: "https://stavysche25-kitl2zs.gamma.site/", visible: false },
+        { type: 'plot', color: 'blue', coords: [49.957788, 29.691694], name: "Ставище", price: "$5,500", size: "0.23 га", distance: "80 км", link: "https://sites.google.com/view/stavishche-23", visible: false },
+        { type: 'plot', color: 'blue', coords: [49.476711, 30.139640], name: "Іванівка", price: "$7,500", size: "0.36 га", distance: "111 км", link: "https://sites.google.com/view/ivanivka-112?usp=sharing", visible: false },
+        { type: 'plot', color: 'blue', coords: [49.632752, 31.546075], name: "Михайлівка", price: "$10,000", size: "1 га", distance: "120 км", link: "https://sites.google.com/view/myhailivka/%D0%B3%D0%BB%D0%B0%D0%B2%D0%BD%D0%B0%D1%8F-%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B0", visible: false }
+      ];
 
-      plots.forEach(plot => {
-        if (!plot.hasOwnProperty("visible") || plot.visible) {
-          let marker = L.marker(plot.coords, {
-            icon: createCustomIcon(plot.type, plot.color)
-          });
-          
-          marker.bindPopup(`
-            <b>${plot.name}</b><br>
-            Ціна: ${plot.price}<br>
-            Площа: ${plot.size}<br>
-            Відстань до Києва: ${plot.distance}<br>
-            <a href="${plot.link}" target="_blank" rel="noopener noreferrer">Докладніше</a>
-          `);
+      plots.forEach(plot => {
+        if (!plot.hasOwnProperty("visible") || plot.visible) {
+          let marker = L.marker(plot.coords, {
+            icon: createCustomIcon(plot.type, plot.color)
+          });
+          
+          marker.bindPopup(`
+            <b>${plot.name}</b><br>
+            Ціна: ${plot.price}<br>
+            Площа: ${plot.size}<br>
+            Відстань до Києва: ${plot.distance}<br>
+            <a href="${plot.link}" target="_blank" rel="noopener noreferrer">Докладніше</a>
+          `);
 
-          marker.on('click', function() {
-            if (typeof gtag === 'function') {
-              gtag('event', 'select_plot', { 'plot_id': plot.name });
-            }
-          });
-          
-          markers.addLayer(marker);
+          marker.on('click', function() {
+            if (typeof gtag === 'function') {
+              gtag('event', 'select_plot', { 'plot_id': plot.name });
+            }
+          });
+          
+          markers.addLayer(marker);
+        }
+      });
+
+      map.addLayer(markers);
+
+      <script>
+        if (markers.getLayers().length > 0) {
+          var bounds = markers.getBounds();
+          map.fitBounds(bounds, { padding: [50, 50] });
         }
-      });
-
-      map.addLayer(markers);
-    });
-  </script>
+      </script>
+    });
+  </script>
 </body>
 </html>
