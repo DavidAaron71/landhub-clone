@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>Інтерактивна карта земельних ділянок</title>
-  
+
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
@@ -13,18 +13,8 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet.awesome-markers@2.0.4/dist/leaflet.awesome-markers.css">
 
   <style>
-    /* Стилі для карти, щоб вона займала весь доступний простір */
-    body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      width: 100%;
-      overflow: hidden; /* Забираємо можливі скролбари */
-    }
-    #map {
-      height: 100%;
-      width: 100%;
-    }
+    body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; }
+    #map { height: 100%; width: 100%; }
   </style>
 
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-GBY1G4B8K8"></script>
@@ -41,10 +31,9 @@
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
   <script src="https://unpkg.com/leaflet.awesome-markers@2.0.4/dist/leaflet.awesome-markers.js"></script>
-  
+
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      // Початкове положення не так важливе — далі зробимо fitBounds
       var map = L.map('map').setView([50.4501, 30.5234], 8);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -52,9 +41,7 @@
         language: 'uk'
       }).addTo(map);
 
-      var markers = L.markerClusterGroup({
-        maxClusterRadius: 25
-      });
+      var markers = L.markerClusterGroup({ maxClusterRadius: 25 });
 
       function createCustomIcon(type, color) {
         return L.AwesomeMarkers.icon({
@@ -64,41 +51,160 @@
         });
       }
 
-           var plots = [
-        // ====== АКТИВНЫЕ ======
-        { type: 'house', color: 'green', coords: [49.858071, 30.354294], name: "Мала Антонівка з Хатою", price: "$5,900", size: "0.31 га", distance: "74 км", link: "https://kyiv-land-map-57.lovable.app/house/1", visible: false },
-        { type: 'plot',  color: 'blue',  coords: [50.550367, 29.752162], name: "Королівка",              price: "$4900,000", size: "0.25 га", distance: "50 км", link: "https://landhub.com.ua/plot/31",  visible: true },
-        { type: 'plot',  color: 'blue',  coords: [50.750351, 29.833706], name: "Мирча 25",                 price: "$5,900", size: "0.25 га",distance: "49 км",link: "https://landhub.com.ua/plot/16",  visible: true },
-        { type: 'plot',  color: 'blue',  coords: [50.550618, 29.643551], name: "Забуяння",                price: "$5,900", size: "0.1495 га", distance: "55 км", link: "https://landhub.com.ua/plot/13", visible: true },
-        { type: 'house', color: 'green', coords: [49.818339, 30.991579], name: "Очеретяне",              price: "$7,000", size: "0.25 га", distance: "60 км", link: "https://kyiv-land-map-57.lovable.app/house/3", visible: true },
-        { type: 'plot',  color: 'blue',  coords: [50.359639, 30.139778], name: "Музичі",                 price: "$12,900",size: "0.085 га",distance: "20 км", link: "https://kyiv-land-map-57.lovable.app/plot/10", visible: true },
-        { type: 'plot',  color: 'blue',  coords: [50.177453, 29.923875], name: "Дорогинка",              price: "$8,500", size: "0.26 га", distance: "55 км", link: "https://kyiv-land-map-57.lovable.app/plot/7",  visible: true },
-        { type: 'plot',  color: 'blue',  coords: [49.769642, 31.547382], name: "Келеберда",              price: "$1,500", size: "0.10 га", distance: "120 км",link: "https://kyiv-land-map-57.lovable.app/plot/9",  visible: true },
-        { type: 'plot',  color: 'blue',  coords: [50.026000, 29.754083], name: "Волиця",                price: "$8,500", size: "0.25 га", distance: "80 км", link: "https://landhub.com.ua/plot/22",        visible: false },
-        { type: 'plot',  color: 'blue',  coords: [50.096787, 30.361381], name: "Барахти",                price: "$6,900", size: "0.1592 га",distance: "35 км", link: "https://kyiv-land-map-57.lovable.app/plot/11",visible: true },
-        { type: 'plot',  color: 'blue',  coords: [50.750496, 29.836949], name: "Мирча 23,3",             price: "$7,500", size: "0.233 га", distance: "49 км", link: "https://landhub.com.ua/plot/17",  visible: true },
-        { type: 'house', color: 'green', coords: [50.135176, 29.952216], name: "Велика Офірна",          price: "$21,000",size: "0.25 га", distance: "65 км", link: "https://kyiv-land-map-57.lovable.app/house/2",visible: false },
-        { type: 'plot',  color: 'blue',  coords: [49.476711, 30.139640], name: "Іванівка",               price: "$7,500", size: "0.36 га", distance: "110 км",link: "https://kyiv-land-map-57.lovable.app/plot/8",  visible: true },
+      var plots = [
 
-        // ====== ЧЕРНЕТКИ (копии объектов ниже; НЕ видны пока visible:false) ======
-        { type: 'plot', color: 'blue', coords: [50.614162, 29.671180], name: "Язвинка", price: "$4,500", size: "0.20 га", distance: "60 км", link: "https://landhub.com.ua/plot/14", visible: true },
-        { type: 'plot',  color: 'blue',  coords: [50.304277, 30.027028], name: "Мостище",              price: "$5,000", size: "0.16 га", distance: "30 км", link: "https://kyiv-land-map-57.lovable.app/plot/12",  visible: true },
-        { type: 'plot',  color: 'blue',  coords: [50.430113, 29.815689], name: "Фасівочка",                 price: "$8,500", size: "0.15 га",distance: "30 км",link: "https://landhub.com.ua/plot/15",  visible: true },
-        { type: 'plot',  color: 'blue',  coords: [50.384115, 29.817281], name: "Фасова",                price: "$4,900", size: "0.12 га", distance: "37 км", link: "https://landhub.com.ua/plot/18", visible: true },
-        { type: 'plot', color: 'blue', coords: [50.165526, 30.584006], name: "Старі Безрадичі",              price: "$9,500", size: "0.829 га", distance: "7 км", link: "https://landhub.com.ua/plot/19", visible: true },
-        { type: 'plot',  color: 'blue',  coords: [50.126429, 30.116860], name: "Оленівка",                 price: "$3,000",size: "0.12 га",distance: "45 км", link: "https://landhub.com.ua/plot/20", visible: true },
-        { type: 'plot',  color: 'blue',  coords: [50.845521, 30.311336], name: "Круги",              price: "$7,500", size: "0.25 га", distance: "45 км", link: "https://landhub.com.ua/plot/32",  visible: true },
-        { type: 'plot',  color: 'blue',  coords: [50.154384, 29.963607], name: "Велика Офірна",              price: "$3,500", size: "0.11 га", distance: "70 км",link: "https://landhub.com.ua/plot/23",  visible: true },
-        { type: 'plot',  color: 'blue',  coords: [50.065101, 30.913164], name: "Стайки",                price: "$12,900", size: "0.20 га", distance: "35 км", link: "https://landhub.com.ua/plot/24",       visible: true },
-        { type: 'plot',  color: 'blue',  coords: [50.053986, 30.613018], name: "Григорівка",                price: "$12,500", size: "0.25 га",distance: "30 км", link: "https://landhub.com.ua/plot/25",visible: true },
-        { type: 'plot',  color: 'blue',  coords: [50.164548, 30.154463], name: "Мала Солтанівка",             price: "$9,500", size: "0.25 га", distance: "35 км", link: "https://landhub.com.ua/plot/26",  visible: true },
-        { type: 'plot', color: 'blue', coords: [50.151863, 29.969572], name: "Велика Офірна 9",          price: "$3,000",size: "0.09 га", distance: "70 км", link: "https://landhub.com.ua/plot/29",visible: true },
-        { type: 'plot',  color: 'blue',  coords: [50.105908, 30.636186], name: "Обухів",               price: "$7,500", size: "0.06 га", distance: "30 км",link: "https://landhub.com.ua/plot/30",  visible: true },
+        // ====== АКТИВНІ / ПРОДАНІ ======
+        // visible: false = продана або прихована (зберігається для статистики)
+        // visible: true  = активна, показується на карті
 
-        // ====== ШАБЛОН ДЛЯ НОВОГО (скопируй и меняй; по умолчанию скрыт) ======
-        // { type: 'plot', color: 'blue', coords: [50.4501, 30.5234], name: "НОВИЙ ОБ'ЄКТ — чернетка",
-        //   price: "$0", size: "0.00 га", distance: "0 км",
-        //   link: "https://landhub.com.ua/", visible: false },
+        { type: 'house', color: 'green', coords: [49.858071, 30.354294],
+          name: "Мала Антонівка з Хатою", price: "$5,900", size: "0.31 га", distance: "74 км",
+          link: "https://landhub.com.ua/house/1", visible: false },
+
+        { type: 'plot', color: 'blue', coords: [50.550367, 29.752162],
+          name: "Королівка", price: "$4,900", size: "0.25 га", distance: "50 км",
+          link: "https://landhub.com.ua/plot/25-sotok-bilia-ozera-korolivka-bucha", visible: true },
+
+        { type: 'plot', color: 'blue', coords: [50.750351, 29.833706],
+          name: "Мирча 25", price: "$5,900", size: "0.25 га", distance: "49 км",
+          link: "https://landhub.com.ua/plot/25-sotok-myrcha", visible: true },
+
+        { type: 'plot', color: 'blue', coords: [50.550618, 29.643551],
+          name: "Забуяння", price: "$5,900", size: "0.1495 га", distance: "55 км",
+          link: "https://landhub.com.ua/plot/15-sotok-ozero-lis-zabuiany", visible: true },
+
+        { type: 'house', color: 'green', coords: [49.818339, 30.991579],
+          name: "Очеретяне", price: "$7,000", size: "0.25 га", distance: "60 км",
+          link: "https://landhub.com.ua/house/3", visible: true },
+
+        { type: 'plot', color: 'blue', coords: [50.359639, 30.139778],
+          name: "Музичі", price: "$12,900", size: "0.085 га", distance: "20 км",
+          link: "https://landhub.com.ua/plot/8-sotok-muzychi", visible: true },
+
+        { type: 'plot', color: 'blue', coords: [50.177453, 29.923875],
+          name: "Дорогинка", price: "$8,500", size: "0.26 га", distance: "55 км",
+          link: "https://landhub.com.ua/plot/26-sotok-dorohynka", visible: true },
+
+        { type: 'plot', color: 'blue', coords: [49.769642, 31.547382],
+          name: "Келеберда", price: "$1,500", size: "0.10 га", distance: "120 км",
+          link: "https://landhub.com.ua/plot/10-sotok-keleberda", visible: true },
+
+        { type: 'plot', color: 'blue', coords: [50.026000, 29.754083],
+          name: "Волиця", price: "$8,500", size: "0.25 га", distance: "80 км",
+          link: "https://landhub.com.ua/plot/25-sotok-richka-volytsya", visible: false },
+
+        { type: 'plot', color: 'blue', coords: [50.096787, 30.361381],
+          name: "Барахти", price: "$6,900", size: "0.1592 га", distance: "35 км",
+          link: "https://landhub.com.ua/plot/16-sotok-barakhty", visible: true },
+
+        { type: 'plot', color: 'blue', coords: [50.750496, 29.836949],
+          name: "Мирча 23,3", price: "$7,500", size: "0.233 га", distance: "49 км",
+          link: "https://landhub.com.ua/plot/23-sotok-myrcha-richka", visible: true },
+
+        { type: 'house', color: 'green', coords: [50.135176, 29.952216],
+          name: "Велика Офірна (дім)", price: "$21,000", size: "0.25 га", distance: "65 км",
+          link: "https://landhub.com.ua/house/2", visible: false },
+
+        { type: 'plot', color: 'blue', coords: [49.476711, 30.139640],
+          name: "Іванівка", price: "$7,500", size: "0.36 га", distance: "110 км",
+          link: "https://landhub.com.ua/plot/25-sotok-ivanivka", visible: true },
+
+        { type: 'plot', color: 'blue', coords: [50.614162, 29.671180],
+          name: "Язвинка", price: "$4,500", size: "0.20 га", distance: "60 км",
+          link: "https://landhub.com.ua/plot/20-sotok-lis-zabud-60km", visible: true },
+
+        { type: 'plot', color: 'blue', coords: [50.304277, 30.027028],
+          name: "Мостище", price: "$5,000", size: "0.16 га", distance: "30 км",
+          link: "https://landhub.com.ua/plot/15-sotok-lis-mostyshche", visible: true },
+
+        { type: 'plot', color: 'blue', coords: [50.430113, 29.815689],
+          name: "Фасівочка", price: "$8,500", size: "0.15 га", distance: "30 км",
+          link: "https://landhub.com.ua/plot/15-sotok-fasivochka", visible: true },
+
+        { type: 'plot', color: 'blue', coords: [50.384115, 29.817281],
+          name: "Фасова", price: "$4,900", size: "0.12 га", distance: "37 км",
+          link: "https://landhub.com.ua/plot/25-sotok-richka-fasova", visible: true },
+
+        { type: 'plot', color: 'blue', coords: [50.165526, 30.584006],
+          name: "Старі Безрадичі", price: "$9,500", size: "0.829 га", distance: "7 км",
+          link: "https://landhub.com.ua/plot/8-sotok-bezradychi", visible: true },
+
+        { type: 'plot', color: 'blue', coords: [50.126429, 30.116860],
+          name: "Оленівка", price: "$3,000", size: "0.12 га", distance: "45 км",
+          link: "https://landhub.com.ua/plot/12-sotok-olenivka", visible: true },
+
+        { type: 'plot', color: 'blue', coords: [50.845521, 30.311336],
+          name: "Круги", price: "$7,500", size: "0.25 га", distance: "45 км",
+          link: "https://landhub.com.ua/plot/25-sotok-lis-kruhy-vyshhorodskyi", visible: true },
+
+        { type: 'plot', color: 'blue', coords: [50.154384, 29.963607],
+          name: "Велика Офірна 11", price: "$3,500", size: "0.11 га", distance: "70 км",
+          link: "https://landhub.com.ua/plot/11-sotok-velyka-ofirna", visible: true },
+
+        { type: 'plot', color: 'blue', coords: [50.065101, 30.913164],
+          name: "Стайки", price: "$12,900", size: "0.20 га", distance: "35 км",
+          link: "https://landhub.com.ua/plot/20-sotok-staiky-dnipro-panorama", visible: true },
+
+        { type: 'plot', color: 'blue', coords: [50.053986, 30.613018],
+          name: "Григорівка", price: "$12,500", size: "0.25 га", distance: "30 км",
+          link: "https://landhub.com.ua/plot/25-sotok-hryhorivka-lis-pahorb", visible: true },
+
+        { type: 'plot', color: 'blue', coords: [50.164548, 30.154463],
+          name: "Мала Солтанівка", price: "$9,500", size: "0.25 га", distance: "35 км",
+          link: "https://landhub.com.ua/plot/25-sotok-mala-soltanivka", visible: true },
+
+        { type: 'plot', color: 'blue', coords: [50.151863, 29.969572],
+          name: "Велика Офірна 9", price: "$3,000", size: "0.09 га", distance: "70 км",
+          link: "https://landhub.com.ua/plot/velyka-ofirna-sosnovy-lis", visible: true },
+
+        { type: 'plot', color: 'blue', coords: [50.105908, 30.636186],
+          name: "Обухів", price: "$7,500", size: "0.06 га", distance: "30 км",
+          link: "https://landhub.com.ua/plot/obukhiv-panorama-skhyl", visible: true },
+
+        // ====== ШАБЛОНИ ДЛЯ НОВИХ ДІЛЯНОК ======
+        // Щоб активувати: змінити visible: false → true, і заповнити coords, name, price, size, distance, link
+        // link формат: https://landhub.com.ua/plot/[slug-ділянки]
+
+        { type: 'plot', color: 'blue', coords: [50.4501, 30.5234],
+          name: "НОВИЙ ОБ'ЄКТ 1", price: "$0", size: "0.00 га", distance: "0 км",
+          link: "https://landhub.com.ua/", visible: false },
+
+        { type: 'plot', color: 'blue', coords: [50.4501, 30.5234],
+          name: "НОВИЙ ОБ'ЄКТ 2", price: "$0", size: "0.00 га", distance: "0 км",
+          link: "https://landhub.com.ua/", visible: false },
+
+        { type: 'plot', color: 'blue', coords: [50.4501, 30.5234],
+          name: "НОВИЙ ОБ'ЄКТ 3", price: "$0", size: "0.00 га", distance: "0 км",
+          link: "https://landhub.com.ua/", visible: false },
+
+        { type: 'plot', color: 'blue', coords: [50.4501, 30.5234],
+          name: "НОВИЙ ОБ'ЄКТ 4", price: "$0", size: "0.00 га", distance: "0 км",
+          link: "https://landhub.com.ua/", visible: false },
+
+        { type: 'plot', color: 'blue', coords: [50.4501, 30.5234],
+          name: "НОВИЙ ОБ'ЄКТ 5", price: "$0", size: "0.00 га", distance: "0 км",
+          link: "https://landhub.com.ua/", visible: false },
+
+        { type: 'plot', color: 'blue', coords: [50.4501, 30.5234],
+          name: "НОВИЙ ОБ'ЄКТ 6", price: "$0", size: "0.00 га", distance: "0 км",
+          link: "https://landhub.com.ua/", visible: false },
+
+        { type: 'plot', color: 'blue', coords: [50.4501, 30.5234],
+          name: "НОВИЙ ОБ'ЄКТ 7", price: "$0", size: "0.00 ага", distance: "0 км",
+          link: "https://landhub.com.ua/", visible: false },
+
+        { type: 'plot', color: 'blue', coords: [50.4501, 30.5234],
+          name: "НОВИЙ ОБ'ЄКТ 8", price: "$0", size: "0.00 га", distance: "0 км",
+          link: "https://landhub.com.ua/", visible: false },
+
+        { type: 'plot', color: 'blue', coords: [50.4501, 30.5234],
+          name: "НОВИЙ ОБ'ЄКТ 9", price: "$0", size: "0.00 га", distance: "0 км",
+          link: "https://landhub.com.ua/", visible: false },
+
+        { type: 'plot', color: 'blue', coords: [50.4501, 30.5234],
+          name: "НОВИЙ ОБ'ЄКТ 10", price: "$0", size: "0.00 га", distance: "0 км",
+          link: "https://landhub.com.ua/", visible: false },
+
       ];
 
       plots.forEach(plot => {
@@ -106,55 +212,41 @@
           let marker = L.marker(plot.coords, {
             icon: createCustomIcon(plot.type, plot.color)
           });
-          
-          marker.bindPopup(`
-            <b>${plot.name}</b><br>
-            Ціна: ${plot.price}<br>
-            Площа: ${plot.size}<br>
-            Відстань до Києва: ${plot.distance}<br>
-            <a href="${plot.link}" target="_blank" rel="noopener noreferrer">Докладніше</a>
-          `);
+
+          marker.bindPopup(
+            '<b>' + plot.name + '</b><br>' +
+            'Ціна: ' + plot.price + '<br>' +
+            'Площа: ' + plot.size + '<br>' +
+            'Відстань до Києва: ' + plot.distance + '<br>' +
+            '<a href="' + plot.link + '" target="_blank" rel="noopener noreferrer">Докладніше</a>'
+          );
 
           marker.on('click', function() {
             if (typeof gtag === 'function') {
               gtag('event', 'select_plot', { 'plot_id': plot.name });
             }
           });
-          
+
           markers.addLayer(marker);
         }
       });
 
       map.addLayer(markers);
 
-      /* === АВТОМАСШТАБ + обов'язково включити Київ === */
       const KYIV = L.latLng(50.4501, 30.5234);
 
       function fitAllIncludingKyiv() {
-        // Границі всіх поточних видимих маркерів
         let b = markers.getBounds ? markers.getBounds() : L.latLngBounds();
-
-        // Додаємо Київ, щоб він гарантовано попав у кадр
         let all = L.latLngBounds(b);
         all.extend(KYIV);
-
         if (all.isValid()) {
-          map.fitBounds(all, {
-            padding: [40, 40],  // невеликі поля по краях
-            maxZoom: 11,        // на мобілці не заїжджаємо занадто близько
-            animate: false
-          });
+          map.fitBounds(all, { padding: [40, 40], maxZoom: 11, animate: false });
         } else {
-          // запасний варіант
           map.setView(KYIV, 10);
         }
       }
 
-      // Викликаємо ПІСЛЯ того, як маркери додані в кластер
-      // Невелика затримка — щоб кластер встиг порахувати bounds
       setTimeout(fitAllIncludingKyiv, 0);
-
-      // Перераховуємо при зміні розміру/орієнтації
       map.on('resize', fitAllIncludingKyiv);
     });
   </script>
